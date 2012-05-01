@@ -1,0 +1,62 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'rest_client'
+require 'xmlsimple'
+require 'ruby-growl'
+require 'pp'
+
+class NicoNicoChannel
+private
+  def get_html(url)
+    RestClient.get(url).split(/[\r\n\t]/).delete_if{|l| l==""}
+  end
+
+  def channel_title(html)
+    XmlSimple.xml_in(html.grep(/<title>/).join(""))
+  end
+
+  def latest_video_title(html)
+    html.inject({:html=>[]}){|r,h|
+      case r[:mode]
+      when nil
+        r[:mode] = h=~%r{g-thumb-watch_link}
+        r[:html] << h if r[:mode]
+      else
+        r[:html] << h
+        r[:mode] = h=~%r{p-footer}
+      end
+      r
+    }[:html].join =~ %r{(http://www.nicovideo.jp/watch/\d+)}
+    watch = $1
+
+    og_title = get_html(watch).grep(%r{og:title}).join+"</meta>"
+    {:url=>watch, :title=>XmlSimple.xml_in(og_title)["content"].strip}
+  end
+
+  @notification = "nicochannel checking notification"
+
+public
+  attr_reader :channels
+  def initialize(channels)
+    @growl = Growl.new("localhost", "NicoChan checker")
+    @growl.add_notification("newVideoAdded", "New video is INCOMING")
+    @channels = channels.inject([]){|r, url|
+      url = "http://ch.nicovideo.jp/channel/#{url}" unless url=~%r{^http://}
+      html = get_html(url)
+      title = channel_title(html).split("-")[0].strip
+      latest = latest_video_title(html)
+      r << {:url => url, :title=>title, :latest => latest}
+    }
+  end
+
+  def notify
+    @channels.each{|ch|
+      @growl.notify "newVideoAdded", ch[:title], ch[:latest][:title]
+    }
+  end
+end
+
+conf = File.expand_path("~/.NicoChanWatcher.yaml")
+ch = NicoNicoChannel.new(YAML.load_file(conf))
+ch.notify
