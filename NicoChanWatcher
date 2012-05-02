@@ -6,7 +6,15 @@ require 'xmlsimple'
 require 'ruby-growl'
 require 'pp'
 
-class NicoNicoChannel
+class Hash
+  def deepcopy
+    Marshal.load(Marshal.dump(self))
+  end
+end
+
+class Channel
+  attr_reader :url, :title, :latest
+
 private
   def get_html(url)
     RestClient.get(url).split(/[\r\n\t]/).delete_if{|l| l==""}
@@ -34,29 +42,66 @@ private
     {:url=>watch, :title=>XmlSimple.xml_in(og_title)["content"].strip}
   end
 
+  def load(prev_url)
+    html = get_html(@url)
+    @title = channel_title(html).split("-")[0].strip
+    @latest = latest_video_title(html)
+    @latest[:prev_url] = prev_url
+  end
+
+public
+  def initialize(url, prev_url)
+    @url = url
+    @url = "http://ch.nicovideo.jp/channel/#{url}" unless @url=~%r{^http://}
+    load(prev_url)
+  end
+
+  def updated?
+    @latest[:url]!=@latest[:prev_url]
+  end
+end
+
+
+class NicoNicoChannel
+private
   @notification = "nicochannel checking notification"
 
 public
   attr_reader :channels
-  def initialize(channels)
+  def initialize(config_file)
+    @config_file = config_file
     @growl = Growl.new("localhost", "NicoChan checker")
     @growl.add_notification("newVideoAdded", "New video is INCOMING")
-    @channels = channels.inject([]){|r, url|
-      url = "http://ch.nicovideo.jp/channel/#{url}" unless url=~%r{^http://}
-      html = get_html(url)
-      title = channel_title(html).split("-")[0].strip
-      latest = latest_video_title(html)
-      r << {:url => url, :title=>title, :latest => latest}
+    conf = YAML.load_file(@config_file)
+    @urls = conf["channels"] || []
+    @channels = conf["latest"] || {}
+  end
+
+  def update
+    @channels = @urls.inject({}){|r, url|
+      prev_url = @channels[url] ? @channels[url].latest[:url] : nil
+      ch = Channel.new(url, prev_url)
+      r[url] = ch
+      r
     }
   end
 
   def notify
-    @channels.each{|ch|
-      @growl.notify "newVideoAdded", ch[:title], ch[:latest][:title]
+    @channels.each{|url, ch|
+      @growl.notify("newVideoAdded", ch.title, ch.latest[:title]) if ch.updated?
+    }
+  end
+
+  def save
+    conf = {"channels"=>@urls, "latest"=>@channels}
+    File.open(@config_file, "w") {|f|
+      f.write conf.to_yaml
     }
   end
 end
 
 conf = File.expand_path("~/.NicoChanWatcher.yaml")
-ch = NicoNicoChannel.new(YAML.load_file(conf))
+ch = NicoNicoChannel.new(conf)
+ch.update
 ch.notify
+ch.save

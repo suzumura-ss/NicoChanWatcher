@@ -12,7 +12,4 @@ Watching new videos in specified channels of NicoNicoDoga for OSX.
 == Config
  * ~/.NicoChanWatcher.yaml
    * To specify your channels.
-   * example:
-   # Listing channels URL
-   - http://ch.nicovideo.jp/channel/yuru # is Full-URL of `yurumeitsu`.
-   - nyaruko # is Shortcut of `nyaruko-san`.
+   * Example is `NicoChanWatcher.yaml.sample`.
