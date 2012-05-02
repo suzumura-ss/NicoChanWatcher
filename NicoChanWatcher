@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'yaml'
+require 'base64'
 require 'rest_client'
 require 'xmlsimple'
 require 'ruby-growl'
@@ -71,7 +72,8 @@ public
   def initialize(config_file)
     @config_file = config_file
     @growl = Growl.new("localhost", "NicoChan checker")
-    @growl.add_notification("newVideoAdded", "New video is INCOMING")
+    icon_path = File.expand_path(File.join(File.dirname(__FILE__), "migiue.jpg"))
+    @growl.add_notification("newVideoAdded", "New video is INCOMING", IO.read(icon_path))
     conf = YAML.load_file(@config_file)
     @urls = conf["channels"] || []
     @channels = conf["latest"] || {}
