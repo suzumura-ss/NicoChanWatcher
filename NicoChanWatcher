@@ -7,11 +7,6 @@ require 'xmlsimple'
 require 'ruby-growl'
 require 'pp'
 
-class Hash
-  def deepcopy
-    Marshal.load(Marshal.dump(self))
-  end
-end
 
 class Channel
   attr_reader :url, :title, :latest
@@ -88,9 +83,9 @@ public
     }
   end
 
-  def notify
+  def notify(all = false)
     @channels.each{|url, ch|
-      @growl.notify("newVideoAdded", ch.title, ch.latest[:title]) if ch.updated?
+      @growl.notify("newVideoAdded", ch.title, ch.latest[:title]) if ch.updated? or all
     }
   end
 
@@ -103,7 +98,20 @@ public
 end
 
 conf = File.expand_path("~/.NicoChanWatcher.yaml")
+
+if ARGV[0]=='--help'
+  puts <<__USAGE__
+NicoNicoChannel [options]
+  https://github.com/suzumura-ss/NicoChanWatcher
+  Configuration file is: `#{conf}`.
+  options:
+    --help    Show this message.
+    --force   Notify all-channels to Growl.
+__USAGE__
+  exit 0
+end
+
 ch = NicoNicoChannel.new(conf)
 ch.update
-ch.notify
+ch.notify ARGV.include?("--force")
 ch.save
