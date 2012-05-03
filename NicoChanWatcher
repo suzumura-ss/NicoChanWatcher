@@ -108,7 +108,7 @@ public
   end
 
   def save
-    conf = {"channels"=>@urls, "latest"=>@channels}
+    conf = {"channels"=>@urls, "latest"=>@channels, "last_updated"=>Time.now.iso8601}
     File.open(@config_file, "w") {|f|
       f.write conf.to_yaml
     }
