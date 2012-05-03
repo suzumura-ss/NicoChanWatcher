@@ -3,14 +3,14 @@
 Watching new videos in specified channels of NicoNicoDoga for OSX.
 
 == Requires
-* rest_client
-* xml_simple
-* ruby-growl
+- rest_client
+- xml_simple
+- ruby-growl
 
 == Config
-* ~/.NicoChanWatcher.yaml
-** To specify your channels
-** Example is `NicoChanWatcher.yaml.sample`.
+ ~/.NicoChanWatcher.yaml
+- To specify your channels.
+- Example is `NicoChanWatcher.yaml.sample`.
 
 == launchd setup
 Example plist is  `com.github.suzumura-ss.NicoChanWatcher.plist`.
