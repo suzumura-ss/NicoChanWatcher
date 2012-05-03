@@ -84,12 +84,19 @@ public
   attr_reader :channels
   def initialize(config_file)
     @config_file = config_file
-    @growl = Growl.new("localhost", "NicoChan checker")
+    @growl = Growl.new("localhost", "NicoNico channel watcher")
     icon = Icon.new
     @growl.add_notification("newVideoAdded", "New video is INCOMING", icon.image)
-    conf = YAML.load_file(@config_file)
-    @urls = conf["channels"] || []
-    @channels = conf["latest"] || {}
+    @conf = YAML.load_file(@config_file)
+    @urls = @conf["channels"] || []
+    @channels = @conf["latest"] || {}
+    if @conf["growl"]
+      @priority = @conf["growl"]["priority"] || 0
+      @sticky = @conf["growl"]["sticky"] || false
+    else
+      @priority = 0
+      @sticky = false
+    end
   end
 
   def update
@@ -103,12 +110,12 @@ public
 
   def notify(all = false)
     @channels.each{|url, ch|
-      @growl.notify("newVideoAdded", ch.title, ch.latest[:title]) if ch.updated? or all
+      @growl.notify("newVideoAdded", ch.title, ch.latest[:title], @priority, @sticky) if ch.updated? or all
     }
   end
 
   def save
-    conf = {"channels"=>@urls, "latest"=>@channels, "last_updated"=>Time.now.iso8601}
+    conf = @conf.merge({"latest"=>@channels, "last_updated"=>Time.now.iso8601})
     File.open(@config_file, "w") {|f|
       f.write conf.to_yaml
     }
