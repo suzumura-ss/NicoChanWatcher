@@ -11,3 +11,11 @@ Watching new videos in specified channels of NicoNicoDoga for OSX.
  * ~/.NicoChanWatcher.yaml
    * To specify your channels.
    * Example is `NicoChanWatcher.yaml.sample`.
+
+== launchd setup
+  Example plist is  `com.github.suzumura-ss.NicoChanWatcher.plist`.
+  * Install
+    $ sudo install NicoChanWatcher /usr/local/bin/
+    $ PLIST="com.github.suzumura-ss.NicoChanWatcher.plist"
+    $ cp $PLIST ~/Library/LaunchAgents/
+    $ launchctl load ~/Library/LaunchAgents/$PLIST

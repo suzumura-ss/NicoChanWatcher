@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
 require 'yaml'
 require 'base64'
 require 'rest_client'
@@ -28,7 +29,9 @@ class Channel
 
 private
   def get_html(url)
-    RestClient.get(url).split(/[\r\n\t]/).delete_if{|l| l==""}
+    html = RestClient.get(url, :accept=>"text/html", :accept_charset=>"utf-8")
+    html.force_encoding("UTF-8")
+    html.split(/[\r\n\t]/).delete_if{|l| l==""}
   end
 
   def channel_title(html)
