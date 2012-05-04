@@ -4,8 +4,8 @@
 
 == Requires
 - rest-client
-- xml-simple
 - ruby-growl
+- nokogiri
 
 == Config
  ~/.NicoChanWatcher.yaml

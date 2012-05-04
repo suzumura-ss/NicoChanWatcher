@@ -4,7 +4,7 @@ require 'rubygems'
 require 'yaml'
 require 'base64'
 require 'rest_client'
-require 'xmlsimple'
+require 'nokogiri'
 require 'ruby-growl'
 require 'pp'
 
@@ -32,28 +32,17 @@ private
     html = RestClient.get(url, :accept=>"text/html", :accept_charset=>"utf-8")
     html.force_encoding("UTF-8")
     html.split(/[\r\n\t]/).delete_if{|l| l==""}
+    Nokogiri::HTML(html)
   end
 
   def channel_title(html)
-    XmlSimple.xml_in(html.grep(/<title>/).join(""))
+    html.xpath("//title").text
   end
 
   def latest_video_title(html)
-    html.inject({:html=>[]}){|r,h|
-      case r[:mode]
-      when nil
-        r[:mode] = h=~%r{g-thumb-watch_link}
-        r[:html] << h if r[:mode]
-      else
-        r[:html] << h
-        r[:mode] = h=~%r{p-footer}
-      end
-      r
-    }[:html].join =~ %r{(http://www.nicovideo.jp/watch/\d+)}
-    watch = $1
-
-    og_title = get_html(watch).grep(%r{og:title}).join+"</meta>"
-    {:url=>watch, :title=>XmlSimple.xml_in(og_title)["content"].strip}
+    watch = html.xpath("//p[@class='g-thumb-watch_link']/span/a").attribute("href").value
+    og_title = get_html(watch).xpath("//meta[@property='og:title']/@content")[0].value.strip
+    {:url=>watch, :title=>og_title}
   end
 
   def load(prev_url)
