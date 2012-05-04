@@ -1,6 +1,6 @@
 = NicoChanWatcher
 
-Watching new videos in specified channels of NicoNicoDoga for OSX.
+ニコニコ動画のチャンネルをチェックして、新着動画があったときにGrowlで通知します。
 
 == Requires
 - rest-client
