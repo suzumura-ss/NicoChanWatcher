@@ -3,8 +3,8 @@
 Watching new videos in specified channels of NicoNicoDoga for OSX.
 
 == Requires
-- rest_client
-- xml_simple
+- rest-client
+- xml-simple
 - ruby-growl
 
 == Config
