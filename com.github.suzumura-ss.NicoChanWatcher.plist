@@ -12,8 +12,12 @@
   <key>StartInterval</key><integer>1800</integer>
   <key>RunAtLoad</key><true/>
   <!--
-    <key>StandardOutPath</key><string>/dev/null</string> 
-    <key>StandardErrorPath</key><string>/dev/null</string>
+    Default is /var/log/system.log.
+    See `man 5 launchd.plist` for details.
+  -->
+  <!--
+  <key>StandardOutPath</key><string>/dev/null</string> 
+  <key>StandardErrorPath</key><string>/dev/null</string>
   -->
 </dict>
 </plist>

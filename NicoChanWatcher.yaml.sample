@@ -1,7 +1,8 @@
----
 channels:
-- nyaruko
-- yuru
+- nyaruko: 這いよれ！ニャル子さん
+- yuru: ゆるめいつ
+mylists:
+- 9598955: ちぇんちぇん東方
 growl:
   priority: 0
   sticky: true
