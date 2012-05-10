@@ -10,8 +10,13 @@ require 'pp'
 
 class SimpleBrowser
   def self.get(url)
-    html = open(url, "Accept"=>"text/html", "Accept_charset"=>"utf-8"){|f| f.read}
-    html.force_encoding("UTF-8")
+    begin
+      html = open(url, "Accept"=>"text/html", "Accept_charset"=>"utf-8"){|f| f.read}
+      html.force_encoding("UTF-8")
+    rescue SocketError => e
+      puts "SocketError: #{e} - '#{url}'."
+      html = nil
+    end
     html
   end
   def visit(url)
@@ -38,12 +43,87 @@ class Icon
   attr_reader :image
   # http://www.kanshin.com/keyword/2043123
   # * http://storage.kanshin.com/free/img_49/497961/k1109786399.jpg
-  MIGIUE = "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsL\nDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/\nwAALCAA3ADkBASIA/8QAGgABAQADAQEAAAAAAAAAAAAABQYABAcDAf/EADgQ\nAAEDAgUBBQUECwAAAAAAAAECAwQFEQAGEiExExQiQVFhByRxgZEWQlKhFTND\nVXJ1kpSxwdH/2gAIAQEAAD8A7/jMaUOfDmqfTFlMvqjuFp4NrCumscpNuD6Y\n3cFtVaGquO0dDhXMbZ67iUpJCEk2Go8AnwHkMKYzGYLrlXYoNIfqclDi2WAC\npLYBUq5AAFyByRiZT7V8pdNBfnvMuKQFKaXGc1IJF7GwIuPQnAVWzhkqfObq\ntNr5ptZbG0lMN0peT+B1Onvp2HqNrHHg97ZGnIaYjaY7FQKihyYQtcZA/GkB\nOtV/BJA9ThHL2d8j0WIWGqu+++6vqSJbsZ0rfcPKlHT9B4YcX7TcpoSoipOL\nCQSdMR42Hr3NsUVMqUWrU2PUYTnUjvo1oVa23w8/DG/iW9oRUMmydN79ePwb\nftkYHj0uXW84ZkZOYKxDZiusdNqLICUjW0FHYg+PlbCy8t11sJRCzlUW2wOJ\nEZh5X9RSD9b4+HL+aCQPtq/o/l7Gr62/1g3McdFBgJl1vOtbZbUrppLKWklS\niCbAIbv4YMqKVluk1CHmap1ODOalp0vOJDawIzqhdKUp3BTwobEcAjFXkBhM\nfIdFQk31RkuH4q7x/wA4psTHtAF8iVc7dxkL38dKgbflibqNKqlVqubIVGqA\niTJDUB9LoWUfdUkpKk7i4RyPh4nFdlOn1Sl5ciw6zN7XPb1dR7WpdwVEgalb\nmwIF8L9VvrdHWnq6dWi+9uL28sHVuhU/MEAwqpFTIj6gvSSQQocEEEEHkbHg\nkeOJvMsKNBGXaXCjobZT2pDSU/dAiOi3re/OG8kI0ZGoYKtXuTRvbzSDigxO\n56CDkWt6wCOxuc+dtvztgaj1CDBz3mDtc2OwXIsEjquhN7IXfk+o+oxVfp+j\nfveB/co/7ji7uXK6zmJeZnc55cTUEu60uKmnTbjSe7sm21t9tsdS+32VwrQq\nvQtQG6gvu39Dx+eBq5XKPWqlRWqXUY0t7rSCeg6lSkDsro4G43tikycdWSqE\nbAe4MbD+AYcwJmiCapludT0yEMLlNFtK1pKgL+gOOVV2PVkVV5yoPU1Uh5hH\nQ9yQ5rIUEhIUoXJFxzfb54WTkyXYXmUxPmBRo5t8ynG1HyrJjupdRUISHE8K\nbo8ZJHz049qm1mWJT1OxK2t4tblpMBi5T46Ro59MFxzmyqIkOU7MXuqVaGy9\nBaZLhKe8dm7gC9uN9+MdEy1GchZYpsF1xtb0WM2y4W72ulIG17Hww1jTmw+1\noTZWlaeL8YGkU5aXEl5lJUk3So2Nvh5Y8ztzjMYN+Me7EV1/9WAR5k2wtCh9\nkQq6tS1c24xuY//Z"
-  def initialize(path = nil)
-    @image = if path
-               IO.read(path)
+  MIGIUE = <<__IMAGE__
+/9j/4AAQSkZJRgABAQEAYABgAAD/4QAWRXhpZgAASUkqAAgAAAAAAAAAAAD/
+2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIs
+IxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIy
+MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy
+MjL/wAARCAA3ADkDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAEC
+AwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1Fh
+ByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RF
+RkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZ
+mqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo
+6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL
+/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKR
+obHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RV
+VldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaan
+qKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3
++Pn6/9oADAMBAAIRAxEAPwD3+iszXNXg0HR59TuUkeGAAssYBZskAAZIHUiu
+ZX4seEfLQz380MjIGaJ7aTchIzg4BGR7E0AddaX9netOtrdQztbyGKYRuG8t
+x1U46H2q3XlOreMPBN/fR6rpuvnTdZjHFytnKVmX+5Ku3514HuOMGoJvjLFJ
+ZraRrbwagWKSXhDvbIP76gLvbPZSB7mgD0uPV7N9ck0dJC95HD58iqpIRScD
+cegJ7D0FaVeZ+HvHHgfRbQwRavPPPK/mXF3LbSl55D1Zjt/Idq3H+JvhNFYj
+UpHCgk7bSY4Hv8nFAHYUVR0zUrXV9Nt9RspPMt503o2McfT17VeoA5b4hFh4
+Nuduc+fb9Dj/AJbJWRb6Xd634w8SQnxBrFnDayweXFa3AVRviDHgg9/TFbXx
+AGfAmrnj5IQ/PfawOP0rm9R0rVNV1XxZY6NqAtLy4isJ1lDlP4WUqWXkZCdR
+9O5oA6B/DWuxhUsvGWoxxgdLi2gmb/voqD+eaQ+H/FBIH/Caz7P+wfBu/PH9
+Kv8AhPT9U0vw5a2es3v2y/j3eZNvZ8gsSBubk4BAzWv5sfneTvXzdu7ZnnHT
+OPSgDh/EdvHoNgt3rfjbW4Y2by1MKxKWYgnACR57VmairmPSdQs/E+p6nY30
+V2u2aRRG4FtKwyqqvIK9GHBHQEV3et6Fp3iDTzZaparcW+4PtJIIYdCCCCD1
+HB6EjvXNeJrK2sR4d0uyt0ihX7UkSr/CBaSjHvnPWgDV8AQLb+AtFRTndbLI
+fq3zH+ddLXP+CE2eBtDBbd/oURzj1UGugoA53x0EPgXW94BH2OTr644/XFY+
+j6hY2PjzxB9rvbeAyWtiR5soXOEfPU+4/MV0HimxOqeGr7T1uEge6iMau6lg
+M+wNeU67b6smqzSahNprXE0CeR/oSSbyGChQzDJIyOuePxoA9f8A7f0b/oL2
+H/gSn+NeMS+HNdh8RP4ml8aeHF1BZd6yNenbjptPy8LjjHPHFby+DLvAzeaY
+vqBo1ucfiVq1b+Fbm3lWVNQskkXo0ej2ykfjtoA6r/hPvCwbY2vWW4Dlg/y5
+9j0/WsbXdc0fWtS0WLS9RtrubzrgnyJVZkH2WUdByOcVU1OLxLaae0tprbzG
+LkxLYQZK99o2dfasu3bxbqiXEmneIv8ARVbZGZrGKEyEr8x4jyAM46c89KAP
+QvBx3eCtCOAP9Ag4H+4K3KxvDNtJZeGNNsZZI3mtbaOGQx5xlVA4zg9q2aAK
+l7Z/a0XDbXXpnpWLcac6urTQqSpyrHBx9PSiigCM8daKKKAAc9KnhtJpvuKM
+epOKKKANeys/siNltzt1x0q3RRQB/9k=
+__IMAGE__
+  MIGIUE_RED = <<__IMAGE__
+/9j/4AAQSkZJRgABAQEAYABgAAD//gAMQXBwbGVNYXJrCv/bAIQABwUFBgUF
+BwYGBggHBwgKEQsKCQkKFA8PDBEYFRkZFxUXFxodJSAaHCMcFxchLCEjJygq
+KioZHy4xLSkxJSkqKAEHCAgKCQoTCwsTKBsXGygoKCgoKCgoKCgoKCgoKCgo
+KCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgo/8QBogAAAQUBAQEB
+AQEAAAAAAAAAAAECAwQFBgcICQoLAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUG
+BwgJCgsQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGh
+CCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RV
+VldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeo
+qaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX2
+9/j5+hEAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKR
+obHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RV
+VldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaan
+qKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3
++Pn6/8AAEQgANwA5AwEiAAIRAQMRAf/aAAwDAQACEQMRAD8A9HoqrqF7Hp1p
+JdyhmSMDIUAk5OBjJHcisoeMtG2r5lw8bFQSjRNlc84OARn6E1wH1RswXME5
+kEMqSGJtjhWztYdQfQ+1TVyN5rehXE63lrqJtL1RxKIHIkH91xj5hwPccYNR
+v45RoRCojjuCSrTkM0Sj+8ABuOewIHuaAOoS8gN69kGLTKnmMAMhQeBk9iew
+9qtVy2ma/oFhEY0vZJJHbdJM8TlpG7knH5DtV8+LNHAJ+1M2OTiGQ4+vy8UA
+bdFV7W7ivbeO5gbfHINyn2qxQIyPEuRpEuOvmR9Dj/lotU47Sa/1fU0OpXsC
+QvHtSGQADcgJ6g9/TFXvEgzod4f7qbvrgg/0rLurO7vLrWILG58iaVLeQPuK
+9iCMjkZC9R9O5oGaLaVqCgLBrdyqgdJYo3P5kA/nmj+zdWzj+3ZNv/XtHn88
+f0qxo1td2mnxQX0/n3C53Sbi2ckkDJ5OAQM1c3rv2bhvxnbnn06UAYOqRrp0
+Amv9dvo1J2goEBJPOAFXPaqt0GK2dzDqt1dwXCTDDsNrfunIyAByCOhHBHQE
+Vv3+n22pQeRdxCWPIbHI5HQgjkHr0PTI71l6rBFb/wBm2kEQRB5qoB2AhcY/
+HPWgC54bjEWhWKg9Ygx/Hn+talZ2gLt0SwBOf3CHP1ANaNAGb4h2/wBiX24Z
+HkN19ccfriqVjcwW+uaj508cZaK3I3uBnCtnqfcfmK0dXtzd6dcWwkEbTIVD
+MCRz7CuR1CK8W6drl7UySRr5f7hW3EEAAEjJIyOuePxoA7P+0rH/AJ/bf/v6
+v+NcO+l6gmoNqr65pouQ+4MZzjHTB44GOMc8cVojQpuMz2o9QLGI4/EipYtH
+liYOtzArDoVsYgR+OKANf/hI9JB2nUIMgdQ3H59P1qjqGoWV/c2KWl1FO++Q
+/u3BKjyXHbkc4qG7TVIbcvDftJs6oLePJHfA29faqkZ1i7EjW2p/ugdqmS3R
+CxxyeFyAM46c89KAOk0PnRrDt/o0f/oIq/VHSomg021t3ZWeGJUbbnGQAO/0
+q9QBDPB5wGDhh0qjJakMC6AkHIJwfy9K1O9V7nqtAFI8UUjUtACCpI4Xk+6B
++dRrVy0oAkgg8kHJyx61NR3ooA//2Q==
+__IMAGE__
+  ICONS = [MIGIUE, MIGIUE_RED]
+
+  def initialize(path = MIGIUE)
+    @image = if ICONS.include?(path)
+               Base64.decode64(path).force_encoding("UTF-8")
              else
-               Base64.decode64(MIGIUE).force_encoding("UTF-8")
+               IO.read(path)
              end
   end
 end
@@ -61,24 +141,33 @@ private
         html.encode!("UTF-8")
       rescue WebkitInvalidResponseError => e
         puts e
-        html = "<html></html>"
-        html.force_encoding("UTF-8")
+        html = SimpleBrowser.get(url)
       end
     else
       html = SimpleBrowser.get(url)
     end
-    Nokogiri::HTML(html)
+    Nokogiri::HTML(html || "<html/>")
   end
 
   def page_title
-    @html.xpath("//title").text.split(/[-\u{2010}]/)[0].strip
+    title = @html.xpath("//title").text.split(/[-\u{2010}]/)[0]
+    title ? title.strip : nil
   end
 
 public
-  def initialize(prev_url)
+  def initialize(prev)
     load
-    @latest[:updated] = (@latest[:url] != prev_url)
+    if @latest[:load]
+      @latest[:updated] = (@latest[:url] != prev[:url])
+      @latest[:prev] = prev[:url]
+    else
+      @latest = {:url=>prev[:url], :title=>prev[:title], :updated=>true, :load=>false}
+    end
     remove_instance_variable(:@html)
+  end
+
+  def checked?
+    @latest[:load]
   end
 
   def updated?
@@ -90,9 +179,14 @@ end
 class Channel < Page
 private
   def latest_video_info
-    watch = @html.xpath("//p[@class='g-thumb-watch_link']/span/a").attribute("href").value
-    og_title = get_html(watch).xpath("//meta[@property='og:title']/@content")[0].value.strip
-    {:url=>watch, :title=>og_title}
+    href = @html.xpath("//p[@class='g-thumb-watch_link']/span/a").attribute("href").value
+    if href
+      title = get_html(href).xpath("//meta[@property='og:title']/@content")[0].value
+      title = title.strip if title
+    else
+      title = nil
+    end
+    {:url=>href, :title=>title, :load=>!title.nil?}
   end
 
   def load
@@ -102,10 +196,10 @@ private
   end
 
 public
-  def initialize(url, prev_url)
+  def initialize(url, prev)
     @url = url
     @url = "http://ch.nicovideo.jp/channel/#{url}" unless @url=~%r{^http://}
-    super prev_url
+    super prev
   end
 end
 
@@ -116,7 +210,7 @@ private
     latest = @html.xpath("//div[@class='SYS_box_item']//a[@class='watch']")[0]
     if latest
       href = URI.join(@url, latest.attribute("href").value).to_s
-      {:url=>href, :title=>latest.text.strip}
+      {:url=>href, :title=>latest.text.strip, :load=>true}
     else
       {}
     end
@@ -129,25 +223,24 @@ private
   end
 
 public
-  def initialize(url, prev_url)
+  def initialize(url, prev)
     @url = url
     @url = "http://www.nicovideo.jp/mylist/#{url}" unless @url=~%r{^http://}
-    super prev_url
+    super prev
   end
 end
 
 
 class NicoNicoChannel
-private
-  @notification = "nicochannel checking notification"
-
+  NEW_VIDEO_ADDED = "newVideoAdded"
+  CHECK_FAILED = "checkFailed"
 public
   attr_reader :channels
   def initialize(config_file)
     @config_file = config_file
     @growl = Growl.new("localhost", "NicoNico channel watcher")
-    icon = Icon.new
-    @growl.add_notification("newVideoAdded", "New video is INCOMING", icon.image)
+    @growl.add_notification(NEW_VIDEO_ADDED, "New video is INCOMING", Icon.new.image)
+    @growl.add_notification(CHECK_FAILED, "Check failed", Icon.new(Icon::MIGIUE_RED).image)
     @conf = YAML.load_file(@config_file)
     @channel_urls = (@conf["channels"] || []).map{ |u| (u.is_a? Hash)? u.keys[0]: u }
     @mylist_urls = (@conf["mylists"] || []).map{ |u| (u.is_a? Hash)? u.keys[0]: u }
@@ -155,22 +248,24 @@ public
     if @conf["growl"]
       @priority = @conf["growl"]["priority"] || 0
       @sticky = @conf["growl"]["sticky"] || false
+      @notify_when_check_failed = @conf["growl"]["notify_when_check_failed"] || false
     else
       @priority = 0
       @sticky = false
+      @notify_when_check_failed = false
     end
   end
 
   def update
     mylists = @mylist_urls.inject({}){ |r, url|
-      prev_url = @channels[url] ? @channels[url].latest[:url] : nil
-      ml = MyList.new(url, prev_url)
+      prev = @channels[url] ? @channels[url].latest : {}
+      ml = MyList.new(url, prev)
       r[url] = ml
       r
     }
     @channels = @channel_urls.inject(mylists){ |r, url|
-      prev_url = @channels[url] ? @channels[url].latest[:url] : nil
-      ch = Channel.new(url, prev_url)
+      prev = @channels[url] ? @channels[url].latest : {}
+      ch = Channel.new(url, prev)
       r[url] = ch
       r
     }
@@ -178,7 +273,13 @@ public
 
   def notify(all = false)
     @channels.each{|url, ch|
-      @growl.notify("newVideoAdded", ch.title, ch.latest[:title], @priority, @sticky) if ch.updated? or all
+      if ch.checked?
+        @growl.notify(NEW_VIDEO_ADDED, ch.title, ch.latest[:title], @priority, @sticky) if ch.updated? or all
+      else
+        if @notify_when_check_failed
+          @growl.notify(CHECK_FAILED, ch.title, "Update checking is failed.", @priority, true)
+        end
+      end
     }
   end
 
@@ -208,3 +309,11 @@ ch = NicoNicoChannel.new(conf)
 ch.update
 ch.notify ARGV.include?("--force")
 ch.save
+
+
+File.open("w.jpg", "w"){|f|
+  f.write(Icon.new.image)
+}
+File.open("r.jpg", "w"){|f|
+  f.write(Icon.new(Icon::MIGIUE_RED).image)
+}
