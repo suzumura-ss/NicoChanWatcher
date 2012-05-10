@@ -6,3 +6,4 @@ mylists:
 growl:
   priority: 0
   sticky: true
+  notify_when_check_failed: false

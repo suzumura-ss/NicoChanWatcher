@@ -25,6 +25,7 @@ https://github.com/suzumura-ss/NicoChanWatcher
   growl     ... Growlへのパラメータを指定します
     priproty  ... 通知のプライオリティです。デフォルトは0です。
     sticky    ... trueのとき自動的に消えなくなります。
+    notify_when_check_failed ... マイリストのチェックに失敗したときに通知します。
 
 
 == Option
