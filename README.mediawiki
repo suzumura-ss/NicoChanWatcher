@@ -1,41 +1,38 @@
-= NicoChanWatcher
+== NicoChanWatcher ==
 https://github.com/suzumura-ss/NicoChanWatcher
 
 ニコニコ動画のチャンネルやマイリストをチェックして、新着動画があったときにGrowlで通知します。
 
-== Requires
-- ruby-growl
-- nokogiri
-- capybara (optional:マイリストをチェックする場合に必要です)
+=== Requires ===
+* ruby-growl
+* nokogiri
+* capybara (optional:マイリストをチェックする場合に必要です)
 
-== Config
-~/.NicoChanWatcher.yaml
+=== Config ===
+ ~/.NicoChanWatcher.yaml
 チェックするチャネルやマイリストを列挙します。
 実行する毎にチェック結果を含めて上書きされます。
 `NicoChanWatcher.yaml.sample` がサンプルです。
 
-  channels  ... チャネルを列挙します
-  mylists   ... マイリストを列挙します
-    http:// で始まる場合はニコニコ動画のURLとみなします。
-    それ以外の場合は
-      http://ch.nicovideo.jp/channel/
-      http://www.nicovideo.jp/mylist/
-    を補完します。
-    ハッシュとして記述するとvalueをコメントのように使用できます。
-  growl     ... Growlへのパラメータを指定します
-    priproty  ... 通知のプライオリティです。デフォルトは0です。
-    sticky    ... trueのとき自動的に消えなくなります。
-    notify_when_check_failed ... マイリストのチェックに失敗したときに通知します。
+* channels  ... チャネルを列挙します
+* mylists   ... マイリストを列挙します
+** http:// で始まる場合はニコニコ動画のURLとみなします。それ以外の場合は以下を補完します。
+*** http://ch.nicovideo.jp/channel/
+*** http://www.nicovideo.jp/mylist/
+** ハッシュとして記述するとvalueをコメントのように使用できます。
+* growl     ... Growlへのパラメータを指定します
+** priproty  ... 通知のプライオリティです。デフォルトは0です。
+** sticky    ... trueのとき自動的に消えなくなります。
+** notify_when_check_failed ... マイリストのチェックに失敗したときに通知します。
 
+=== Option ===
+* --force   ... 更新されてない場合も全て通知します。
 
-== Option
-  --force   ... 更新されてない場合も全て通知します。
-
-== launchd setup
+=== launchd setup ===
 OSXで定期的に自動実行する場合の設定は以下の通りです。
 `com.github.suzumura-ss.NicoChanWatcher.plist` がサンプルです。
 
-* インストール
+=== インストール ===
  $ sudo install NicoChanWatcher /usr/local/bin/
  $ PLIST="com.github.suzumura-ss.NicoChanWatcher.plist"
  $ cp $PLIST ~/Library/LaunchAgents/
