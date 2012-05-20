@@ -31,7 +31,8 @@ begin
   require 'capybara/driver/webkit'
   require 'capybara/dsl'
   Capybara.javascript_driver = :webkit
-  Browser = Capybara::Driver::Webkit::Browser.new
+  con = Capybara::Driver::Webkit::Connection.new
+  Browser = Capybara::Driver::Webkit::Browser.new(con)
   WebkitInvalidResponseError = Capybara::Driver::Webkit::WebkitInvalidResponseError
 rescue LoadError => e
   Browser = SimpleBrowser.new
