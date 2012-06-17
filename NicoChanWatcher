@@ -310,11 +310,3 @@ ch = NicoNicoChannel.new(conf)
 ch.update
 ch.notify ARGV.include?("--force")
 ch.save
-
-
-File.open("w.jpg", "w"){|f|
-  f.write(Icon.new.image)
-}
-File.open("r.jpg", "w"){|f|
-  f.write(Icon.new(Icon::MIGIUE_RED).image)
-}
