@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby19
 
 require 'rubygems'
 require 'open-uri'
@@ -180,7 +180,11 @@ end
 class Channel < Page
 private
   def latest_video_info
-    href = @html.xpath("//p[@class='g-thumb-watch_link']/span/a").attribute("href").value
+    begin
+      href = @html.xpath("//p[@class='g-thumb-watch_link']/span/a").attribute("href").value
+    rescue NoMethodError => e
+      href = nil
+    end
     if href
       title = get_html(href).xpath("//meta[@property='og:title']/@content")[0].value
       title = title.strip if title
